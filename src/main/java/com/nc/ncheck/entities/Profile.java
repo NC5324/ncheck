@@ -15,6 +15,8 @@ public class Profile {
     public Long id;
 
     String username;
+
+    @JsonIgnore
     String password;
 
     @JsonIgnore

@@ -1,5 +1,7 @@
 package com.nc.ncheck.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class Item {
 
     String name;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "created_by", referencedColumnName = "id")
     Profile createdBy;
@@ -19,6 +22,7 @@ public class Item {
     @ManyToOne
     @JoinColumn(name="room_id", nullable=false)
     Room room;
+
 
     public Item() {
 

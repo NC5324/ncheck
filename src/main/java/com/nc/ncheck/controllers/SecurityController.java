@@ -6,19 +6,18 @@ import com.nc.ncheck.payload.requests.AccountDto;
 import com.nc.ncheck.payload.response.AuthenticationResponse;
 import com.nc.ncheck.repository.ProfileRepository;
 import com.nc.ncheck.services.MyUserDetailsService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-public class HelloController {
+@RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
+public class SecurityController {
 
     private final AuthenticationManager authenticationManager;
     private final MyUserDetailsService userDetailsService;
@@ -26,7 +25,7 @@ public class HelloController {
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public HelloController(AuthenticationManager authenticationManager, MyUserDetailsService userDetailsService, JwtUtils jwtUtils, ProfileRepository profileRepository, PasswordEncoder passwordEncoder) {
+    public SecurityController(AuthenticationManager authenticationManager, MyUserDetailsService userDetailsService, JwtUtils jwtUtils, ProfileRepository profileRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtils = jwtUtils;
@@ -44,12 +43,13 @@ public class HelloController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         } catch(BadCredentialsException e) {
-            throw new Exception("Incorrect username or password", e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            //throw new Exception("Incorrect username or password", e);
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String jwt = jwtUtils.generateToken(userDetails);
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, authenticationRequest.getUsername()));
     }
 
     @PostMapping("/signup")

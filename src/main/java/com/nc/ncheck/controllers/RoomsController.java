@@ -7,7 +7,6 @@ import com.nc.ncheck.payload.requests.RoomRequest;
 import com.nc.ncheck.repository.ItemsRepository;
 import com.nc.ncheck.repository.ProfileRepository;
 import com.nc.ncheck.repository.RoomsRepository;
-import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +30,15 @@ public class RoomsController {
         this.itemsRepository = itemsRepository;
     }
 
+
     @GetMapping("/user")
-    public ResponseEntity<?> getAllRoomsByUsername(@RequestParam Long userId) {
+    public ResponseEntity<?> getAllRoomsByUser(@RequestParam Long userId) {
         var user = profileRepository.findById(userId);
         if(user.isEmpty())
             return ResponseEntity.ok("No entry found matching the given data.");
 
         var response = roomsRepository.findAllByUser(user.get());
+
         return ResponseEntity.ok(response);
     }
 
@@ -47,15 +48,13 @@ public class RoomsController {
 
         Set<Profile> participants = new HashSet<>();
         var creator = profileRepository.findById(roomRequest.getOwner());
-        if(creator.isPresent())
-            participants.add(creator.get());
+        creator.ifPresent(participants::add);
 
         var participantIds = roomRequest.getParticipants();
         if(participantIds != null) {
             for(var participantId : participantIds) {
                 var participant = profileRepository.findById(participantId);
-                if(participant.isPresent())
-                    participants.add(participant.get());
+                participant.ifPresent(participants::add);
             }
         }
         newRoom.setParticipants(participants);
@@ -66,8 +65,7 @@ public class RoomsController {
         if(itemIds != null) {
             for(var itemId : itemIds) {
                 var item = itemsRepository.findById(itemId);
-                if(item.isPresent())
-                    items.add(item.get());
+                item.ifPresent(items::add);
             }
         }
         newRoom.setItems(items);
