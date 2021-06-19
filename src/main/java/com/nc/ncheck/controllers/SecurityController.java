@@ -52,7 +52,7 @@ public class SecurityController {
 
 
         final String jwt = jwtUtils.generateToken(userDetails);
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, authenticationRequest.getUsername(), userProfile.getId()));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, authenticationRequest.getUsername(), userProfile.getId(), userProfile.getProfilePicPath()));
     }
 
     @PostMapping("/signup")

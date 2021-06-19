@@ -41,7 +41,7 @@ public class Profile {
     }
 
     public String getProfilePicPath() {
-        return profilePicPath;
+        return "localhost:8080/src/main/resources/" + profilePicPath;
     }
 
     public void setProfilePicPath(String profilePicPath) {
