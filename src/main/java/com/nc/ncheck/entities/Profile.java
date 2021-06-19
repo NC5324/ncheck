@@ -19,9 +19,11 @@ public class Profile {
     @JsonIgnore
     String password;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "participants")
     Set<Room> rooms;
+
+    @Column(name = "profile_pic")
+    String profilePicPath;
 
 
     public Profile() {
@@ -32,6 +34,18 @@ public class Profile {
         this.username = username;
         this.password = password;
         this.rooms = new HashSet<>();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getProfilePicPath() {
+        return profilePicPath;
+    }
+
+    public void setProfilePicPath(String profilePicPath) {
+        this.profilePicPath = profilePicPath;
     }
 
     public Long getId() {

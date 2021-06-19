@@ -3,6 +3,7 @@ package com.nc.ncheck.controllers;
 import com.nc.ncheck.entities.Item;
 import com.nc.ncheck.entities.Profile;
 import com.nc.ncheck.entities.Room;
+import com.nc.ncheck.payload.requests.ItemDeleteRequest;
 import com.nc.ncheck.payload.requests.RoomRequest;
 import com.nc.ncheck.repository.ItemsRepository;
 import com.nc.ncheck.repository.ProfileRepository;
@@ -120,14 +121,8 @@ public class RoomsController {
         if(targetRoom.isEmpty())
             return ResponseEntity.ok("No room found with the given ID.");
 
-        var creator = profileRepository.findById(Long.parseLong(request.get("userId")+""));
-        if(creator.isEmpty())
-            return ResponseEntity.ok("No profile found with the given ID.");
-
         var roomItems = targetRoom.get().getItems();
-        var item = new Item((String)request.get("name"), creator.get(), targetRoom.get());
-
-        System.out.println(2);
+        var item = new Item((String)request.get("name"), targetRoom.get());
 
         itemsRepository.save(item);
         roomItems.add(item);
@@ -140,6 +135,33 @@ public class RoomsController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{roomId}/items/delete")
+    public ResponseEntity<?> deleteItems(@PathVariable Long roomId, @RequestBody ItemDeleteRequest request) {
+        var targetRoom = roomsRepository.findById(roomId);
+        if(targetRoom.isEmpty())
+            return ResponseEntity.ok("No room found with the given ID.");
+
+        var creator = profileRepository.findById(Long.parseLong(request.getUserId()+""));
+        if(creator.isEmpty())
+            return ResponseEntity.ok("No profile found with the given ID.");
+
+        var items = targetRoom.get().getItems();
+        var itemIds = request.getDeletedItems();
+        if(itemIds != null) {
+            for(var itemId : itemIds) {
+                var item = itemsRepository.findById(itemId);
+                item.ifPresent(items::remove);
+            }
+        }
+        targetRoom.get().setItems(items);
+        roomsRepository.save(targetRoom.get());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", items);
+        response.put("message", "Successfully added new list item.");
+        return ResponseEntity.ok(response);
+    }
+
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteRoomById(@RequestParam Long id) {
@@ -147,7 +169,9 @@ public class RoomsController {
         if(deletedRoom.isEmpty())
             return ResponseEntity.ok("No entry found matching the given data.");
 
+        roomsRepository.deleteConstraints(deletedRoom.get().getId());
         roomsRepository.delete(deletedRoom.get());
+
         Map<String, Object> response = new HashMap<>();
         response.put("data", deletedRoom);
         response.put("message", String.format("Deleted room with ID: %d", id));

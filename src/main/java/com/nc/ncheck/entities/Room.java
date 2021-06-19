@@ -1,5 +1,7 @@
 package com.nc.ncheck.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -15,13 +17,14 @@ public class Room {
     Long owner;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "profile_room",
             joinColumns = @JoinColumn(name = "room_id"),
             inverseJoinColumns = @JoinColumn(name = "profile_id"))
     Set<Profile> participants;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     Set<Item> items;
 
     public Room() {
@@ -32,6 +35,14 @@ public class Room {
     {
         this.name = name;
         this.owner = ownerId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

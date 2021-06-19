@@ -39,7 +39,7 @@ public class SecurityController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AccountDto authenticationRequest) throws Exception  {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AccountDto authenticationRequest) { //throws Exception  {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         } catch(BadCredentialsException e) {
@@ -48,8 +48,11 @@ public class SecurityController {
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final Profile userProfile = profileRepository.findByUsername(authenticationRequest.getUsername());
+
+
         final String jwt = jwtUtils.generateToken(userDetails);
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, authenticationRequest.getUsername()));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, authenticationRequest.getUsername(), userProfile.getId()));
     }
 
     @PostMapping("/signup")

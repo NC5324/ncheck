@@ -4,10 +4,19 @@ import java.util.List;
 import java.util.Set;
 
 public class RoomRequest {
+    Long id;
     String name;
     Long owner;
     Set<Long> participants;
     Set<Long> items;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

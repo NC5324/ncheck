@@ -1,5 +1,6 @@
 package com.nc.ncheck;
 
+import com.nc.ncheck.entities.Profile;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -35,6 +36,11 @@ public class JwtUtils {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
+    }
+
+    public String generateToken(Profile profile) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, profile.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {

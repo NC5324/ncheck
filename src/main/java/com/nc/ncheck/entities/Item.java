@@ -14,11 +14,6 @@ public class Item {
 
     String name;
 
-    @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
-    Profile createdBy;
-
     @ManyToOne
     @JoinColumn(name="room_id", nullable=false)
     Room room;
@@ -28,9 +23,8 @@ public class Item {
 
     }
 
-    public Item(String name, Profile creator, Room room) {
+    public Item(String name, Room room) {
         this.name = name;
-        this.createdBy = creator;
         this.room = room;
     }
 
@@ -40,14 +34,6 @@ public class Item {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Profile getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Profile createdBy) {
-        this.createdBy = createdBy;
     }
 
     public Long getId() {
